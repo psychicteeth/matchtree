@@ -98,7 +98,7 @@ MonoBehaviour:
   x: 0
   y: 0
   colliderRadiusLarge: 0.5
-  colliderRadiusSmall: 0.33
+  colliderRadiusSmall: 0.38
   collider: {fileID: 0}
 --- !u!58 &6664876536871758964
 CircleCollider2D:
@@ -115,7 +115,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.32
+  m_Radius: 0.38
 --- !u!95 &2959867003966831015
 Animator:
   serializedVersion: 3
@@ -126,7 +126,7 @@ Animator:
   m_GameObject: {fileID: 3791756649546576048}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: cdb2450a86e295c439b0e30c10a53244, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

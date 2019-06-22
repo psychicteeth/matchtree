@@ -52,9 +52,11 @@ public class SelectionToneAudio : MonoBehaviour
             toneSources[i] = gameObject.AddComponent<AudioSource>();
             toneSources[i].spatialBlend = 0;
             int octave = (i / pitches.Length) + 1;
+            if (octave == 3) octave = 4; // there's prob some maths here but I don't have time
             int noteIndex = i % pitches.Length;
             float pitch = pitches[noteIndex] * octave;
             pitch *= notePitch;
+            Debug.Log(i + " " + octave + " " + noteIndex + " " + pitch);
             toneSources[i].pitch = pitch;
         }
     }

@@ -71,8 +71,12 @@ public class Game : MonoBehaviour
             {
                 match.piece.Deselect();
             }
-
-            toneAudioComponent.PlayTone(matches.Count - 1);
+            
+            // play the tone for the last selected bubble again
+            if (removedItems.Count > 0) // but only if we actually removed some other bubbles
+            {
+                toneAudioComponent.PlayTone(matches.Count - 1);
+            }
 
             removedItems.Clear();
         }

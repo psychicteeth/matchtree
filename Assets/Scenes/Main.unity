@@ -399,6 +399,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38f05707fb76afd4b8e797fc746875d9, type: 2}
   - {fileID: 11400000, guid: 612213598b1a7cd4c95a7d8c886fcacc, type: 2}
   particles: {fileID: 5419807124654980323}
+  pieceExplodeSound: {fileID: 8300000, guid: 9c8273cdf87dbdd47a0ed73447e3b6e3, type: 3}
+  pieceExplodeSources: []
+  popVolume: 1
 --- !u!4 &446644571
 Transform:
   m_ObjectHideFlags: 0
