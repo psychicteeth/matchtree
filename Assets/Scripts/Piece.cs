@@ -30,6 +30,8 @@ public class Piece : MonoBehaviour
     static int selectedHash = Animator.StringToHash("Selected");
     static int deselectedHash = Animator.StringToHash("Deselected");
 
+    static Board board = null; // for playing sounds
+
     public enum State
     {
         Delay,
@@ -41,6 +43,7 @@ public class Piece : MonoBehaviour
 
     private void Awake()
     {
+        if (board == null) board = FindObjectOfType<Board>();
     }
 
     void Update()
@@ -72,6 +75,9 @@ public class Piece : MonoBehaviour
                         // hit the target tile, bounce up
                         ySpeed = -ySpeed * Random.Range(bounceFrictionMin, bounceFrictionMax);
                         pos.y = y;
+
+                        board.PlayDripSound();
+
                         if (ySpeed < minSpeed)
                         {
                             // done fallin

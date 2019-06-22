@@ -400,8 +400,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 612213598b1a7cd4c95a7d8c886fcacc, type: 2}
   particles: {fileID: 5419807124654980323}
   pieceExplodeSound: {fileID: 8300000, guid: 9c8273cdf87dbdd47a0ed73447e3b6e3, type: 3}
-  pieceExplodeSources: []
+  dripSound: {fileID: 8300000, guid: dca7b8118e4e42c469ce306d6085ae26, type: 3}
+  randomPitchSources: []
   popVolume: 1
+  dripVolume: 1
 --- !u!4 &446644571
 Transform:
   m_ObjectHideFlags: 0

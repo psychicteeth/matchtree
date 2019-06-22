@@ -52,10 +52,17 @@ public class Board : MonoBehaviour
 
     // Assign in editor please
     public AudioClip pieceExplodeSound;
-    // I don't know how mobile audio performance is. Might be better performance-wise to have a set of various pop sounds
+    public AudioClip dripSound;
+    // I don't know how mobile audio performance is. Might be better performance-wise to have a set of variously-pitched sound clips
     // instead of having a set of variously-pitched sources.
-    public List<AudioSource> pieceExplodeSources = new List<AudioSource>();
+    public List<AudioSource> randomPitchSources = new List<AudioSource>();
     public float popVolume = 1.0f;
+    public float dripVolume = 1.0f;
+
+    // dripping sounds for when the pieces bounce - only play this once per N frames max
+    int dripSoundFrameDelay = 4;
+    int dripSoundFrameCounter = 0;
+    bool playDripSound = false;
 
     void Awake()
     {
@@ -82,9 +89,21 @@ public class Board : MonoBehaviour
         for (int i = 0; i < 12; i++)
         {
             AudioSource source = gameObject.AddComponent<AudioSource>();
-            pieceExplodeSources.Add(source);
-            source.volume = popVolume;
+            randomPitchSources.Add(source);
             source.pitch = Random.Range(0.9f, 1.3f);
+        }
+    }
+
+    // do the drip sound in late update as the pieces update in update and we want to play the sounds on the same frame if poss
+    private void LateUpdate()
+    {
+        if (dripSoundFrameCounter > 0) dripSoundFrameCounter--;
+
+        if (playDripSound && dripSoundFrameCounter == 0)
+        {
+            playDripSound = false;
+            dripSoundFrameCounter = dripSoundFrameDelay;
+            randomPitchSources.GetRandom().PlayOneShot(dripSound, dripVolume);
         }
     }
 
@@ -286,7 +305,7 @@ public class Board : MonoBehaviour
             particles.transform.position = tiles[x, y].transform.position;
             particles.Play();
 
-            pieceExplodeSources.GetRandom().PlayOneShot(pieceExplodeSound);
+            randomPitchSources.GetRandom().PlayOneShot(pieceExplodeSound, popVolume);
 
             yield return removeTileDelayWaiters[i];
             i = Mathf.Min(i + 1, removeWaiterArraySize - 1);
@@ -300,5 +319,10 @@ public class Board : MonoBehaviour
     public BoardTile GetTile(int x, int y)
     {
         return tiles[x, y];
+    }
+
+    public void PlayDripSound()
+    {
+        playDripSound = true;
     }
 }
