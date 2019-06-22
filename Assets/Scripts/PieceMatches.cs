@@ -45,11 +45,12 @@ public class PieceMatches : IEnumerable
         return matches[matches.Count - 1];
     }
 
-    public void RemoveAfter(Piece piece)
+    public void RemoveAfter(Piece piece, List<MatchData> removedMatches)
     {
         int index = matches.FindIndex((MatchData match) => { return match.piece == piece; });
         index++;
         if (index == matches.Count) return;
+        removedMatches.AddRange(matches.GetRange(index, matches.Count - index));
         matches.RemoveRange(index, matches.Count - index);
     }
 

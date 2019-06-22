@@ -5,21 +5,27 @@ using UnityEngine.EventSystems;
 
 public class Piece : MonoBehaviour
 {
-    float scale = 0;
-    float targetScale = Board.spriteScale;
     int x;
     int y;
     float ySpeed = 0;
     float delayTimer = 0;
     PieceData type;
 
-    static float gravity = -1.0f;
-    static float bounceFriction = 0.2f;
+    static float gravity = -0.9f;
+    static float bounceFrictionMin = 0.2f;
+    static float bounceFrictionMax = 0.3f;
     const float minSpeed = 0.1f;
 
     // Set in prefab please
     public SpriteRenderer spriteRenderer;
-    
+    public Animator animator;
+
+    // state hashes
+    static int hiddenStateHash = Animator.StringToHash("Hidden");
+    static int appearHash = Animator.StringToHash("Appear");
+    static int selectedHash = Animator.StringToHash("Selected");
+    static int deselectedHash = Animator.StringToHash("Deselected");
+
     public enum State
     {
         Delay,
@@ -44,6 +50,7 @@ public class Piece : MonoBehaviour
                     if (delayTimer <= 0)
                     {
                         state = State.Falling;
+                        animator.SetTrigger(appearHash);
                     }
                 }
                 break;
@@ -52,10 +59,6 @@ public class Piece : MonoBehaviour
                     // subtract excess delay timer for subframe timing.
                     float time = Time.deltaTime - delayTimer;
 
-                    // transition in. To-do: use animation or at least an AnimationCurve for this
-                    scale = Mathf.Lerp(scale, targetScale, Mathf.Clamp(time, 0.05f, 0.1f) * 3);
-                    transform.localScale = Vector3.one * scale;
-
                     // animate bouncing to destination
                     ySpeed += gravity * time;
                     Vector3 pos = transform.localPosition;
@@ -63,12 +66,13 @@ public class Piece : MonoBehaviour
                     if (pos.y < y)
                     {
                         // hit the target tile, bounce up
-                        ySpeed = -ySpeed * bounceFriction;
+                        ySpeed = -ySpeed * Random.Range(bounceFrictionMin, bounceFrictionMax);
                         pos.y = y;
                         if (ySpeed < minSpeed)
                         {
                             // done fallin
                             state = State.Idle;
+                            ySpeed = 0;
                         }
                     }
                     transform.localPosition = pos;
@@ -94,12 +98,11 @@ public class Piece : MonoBehaviour
         delayTimer = delay;
         state = State.Delay;
         SetType(type);
-        scale = 0;
-        transform.localScale = Vector3.one * scale;
         ySpeed = 0;
         SetPosition(x, y);
         // set actual position to above so they bounce in from the top
         transform.localPosition = new Vector3(x, y + 10, 0);
+        animator.Play(hiddenStateHash);
     }
 
     void SetState(State state)
@@ -118,9 +121,15 @@ public class Piece : MonoBehaviour
     public void SetPosition(int x, int y)
     {
         this.x = x; // this will snap the position in x if different
-        this.y = y; // we don't support moving tiles upwards at the moment but don't assert here because it can happen in Reset
-        // kick off a falling state
+        this.y = y; // we don't support moving tiles upwards but don't assert here because it can happen in Reset
+    }
+
+    public void Fall(int newY, float delay)
+    {
+        SetPosition(x, newY);
         state = State.Delay;
+        ySpeed = 0;
+        delayTimer = delay;
     }
 
     // wrapping this up in case I change how pieces record their type
@@ -132,10 +141,12 @@ public class Piece : MonoBehaviour
     public void Select()
     {
         spriteRenderer.color = type.highlightColor;
+        animator.SetTrigger(selectedHash);
     }
     public void Deselect()
     {
         spriteRenderer.color = type.color;
+        animator.SetTrigger(deselectedHash);
     }
 
 }

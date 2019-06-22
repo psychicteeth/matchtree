@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public const int maxBoardWidth = 10;
-    public const int maxBoardHeight = 15;
+    public const int maxBoardWidth = 7;
+    public const int maxBoardHeight = 9;
     public const int maxTilesCount = maxBoardWidth * maxBoardHeight;
     // delay between pieces appearing for fancy appearing at board reset
-    const float delayIncrement = 0.01f;
+    const float delayIncrementMin = 0.02f;
+    const float delayIncrementMax = 0.04f;
+    const float delayIncrementColumn = 0.06f;
     // unity's regular sprite is a weird size?
     public const float spriteScale = 0.38f;
     // delays for the sequences
     public const float removeTileDelay = 0.2f;
+
 
     // board size
     public int minWidth;
@@ -89,7 +92,6 @@ public class Board : MonoBehaviour
                 boardGOs[x, y].SetActive(true);
                 // assume board tiles are 1x1 units
                 boardGOs[x, y].transform.localPosition = new Vector3(x, y, 0);
-                boardGOs[x, y].transform.localScale = Vector3.one * spriteScale;
             }
         }
     }
@@ -119,18 +121,17 @@ public class Board : MonoBehaviour
     // Fills the board with random pieces.
     public void FillBoard()
     {
-        float delay = 0;
         for (int x = 0; x < width; x++)
         {
+            float delay = x * delayIncrementColumn;
             for (int y = 0; y < height; y++)
             {
                 if (tiles[x, y] != null)
                 {
                     AddPiece(x, y, delay);
-                    delay += delayIncrement;
+                    delay += Random.Range(delayIncrementMin, delayIncrementMax);
                 }
             }
-            delay -= delayIncrement * width / 2.0f;
         }
     }
 
@@ -142,9 +143,10 @@ public class Board : MonoBehaviour
             // get the piece, reset it and set its location
             GameObject pieceGO = piecesPool.Get();
             Piece piece = pieceGO.GetComponent<Piece>();
-            piece.Reset(x, y, pieceTypes.GetRandom(), delay);
 
             pieceGO.SetActive(true);
+
+            piece.Reset(x, y, pieceTypes.GetRandom(), delay);
 
             // put the piece in the tile
             tiles[x, y].contents = piece;
@@ -174,6 +176,7 @@ public class Board : MonoBehaviour
         // this is still column first but should be ok
         for (int x = 0; x < width; x++)
         {
+            float delay = 0;
             for (int y = 0; y < height; y++)
             {
                 if (tiles[x, y].contents == null)
@@ -188,7 +191,7 @@ public class Board : MonoBehaviour
                         {
                             tiles[x, target].contents = piece;
                             tiles[x, cursor].contents = null;
-                            piece.SetPosition(x, target);
+                            piece.Fall(target, delay);
                             target++;
                         }
                         cursor++;
@@ -199,11 +202,14 @@ public class Board : MonoBehaviour
                         // walk up and pop in a new piece to remaining empty cells
                         while (target < height)
                         {
-                            AddPiece(x, target);
+                            AddPiece(x, target, delay);
                             target++;
                         }
                     }
+
                 }
+
+                delay += Random.Range(delayIncrementMin, delayIncrementMax);
             }
         }
     }
@@ -245,9 +251,11 @@ public class Board : MonoBehaviour
     {
         foreach (MatchData match in matches)
         {
+            Debug.Assert(match.piece != null);
             match.piece.Deselect();
             int x = match.x;
             int y = match.y;
+            Debug.Assert(tiles[x, y].contents != null);
             piecesPool.Return(tiles[x, y].contents.gameObject);
             tiles[x, y].contents = null;
 
@@ -257,5 +265,10 @@ public class Board : MonoBehaviour
         ShuffleDown(true);
 
         if (OnRemovePiecesSequenceComplete != null) OnRemovePiecesSequenceComplete.Invoke();
+    }
+
+    public BoardTile GetTile(int x, int y)
+    {
+        return tiles[x, y];
     }
 }

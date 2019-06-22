@@ -11,10 +11,14 @@ public class Game : MonoBehaviour
     Piece startingPiece;
     PieceMatches matches;
 
+    // stores results from the piece matcher
+    List<MatchData> removedItems = new List<MatchData>();
+
     enum State
     {
         Idle,
-        Picking
+        Picking,
+        WaitingForTransition
     }
 
     State state;
@@ -32,16 +36,19 @@ public class Game : MonoBehaviour
 
     public void OnTileMouseClicked(int x, int y, Piece piece)
     {
+        if (state != State.Idle) return;
+        // is there even a piece here?
+        if (piece == null) return;
         state = State.Picking;
         startingPiece = piece;
         piece.Select();
         matches.Add(piece, x, y);
-        // Also instruct all pieces to shrink their hitboxes
-
     }
 
     public void OnTileMouseEnter(int x, int y, Piece piece)
     {
+        // is there even a piece here?
+        if (piece == null) return;
         // are we idle?
         if (state != State.Picking) return;
         // does the type match?
@@ -56,21 +63,18 @@ public class Game : MonoBehaviour
         {
             // if so, chop off the rest of the line.
 
-            // I didn't want to put the selection logic into PieceMatches so this is how it gets done here, deselect everything, remove some of it, then reselect them all
-            foreach (MatchData match in matches)
+            matches.RemoveAfter(piece, removedItems);
+
+            foreach (MatchData match in removedItems)
             {
                 match.piece.Deselect();
             }
-
-            matches.RemoveAfter(piece);
-
-            foreach (MatchData match in matches)
-            {
-                match.piece.Select();
-            }
+            removedItems.Clear();
         }
         else
         {
+            Debug.Assert(piece != null);
+            Debug.Assert(board.GetTile(x,y).contents == piece);
             // otherwise, add it to the list
             matches.Add(piece, x, y);
             piece.Select();
@@ -79,6 +83,7 @@ public class Game : MonoBehaviour
 
     public void OnTileMouseReleased(int x, int y, Piece piece)
     {
+        if (state != State.Picking) return;
 
         if (matches.Count > 2)
         {
@@ -86,6 +91,18 @@ public class Game : MonoBehaviour
             // match made - remove the pieces and shuffle everything down.
             // this also fills in spaces at the top of the board with new pieces, by default
             board.RemoveSequence(matches);
+
+            state = State.WaitingForTransition;
+        }
+        else
+        {
+            // still need to clear and deselect all pieces
+            foreach (MatchData match in matches)
+            {
+                match.piece.Deselect();
+            }
+            matches.Clear();
+            state = State.Idle;
         }
     }
 

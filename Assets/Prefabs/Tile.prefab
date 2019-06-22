@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3791756649546576051}
   - component: {fileID: 8533569592093212860}
   - component: {fileID: 6664876536871758964}
+  - component: {fileID: 2959867003966831015}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -71,7 +72,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f4c7fd60e487ff74d9c29e18be714adc, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6509434, g: 0.5250534, b: 0.58806, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -96,8 +97,8 @@ MonoBehaviour:
   contents: {fileID: 0}
   x: 0
   y: 0
-  colliderRadiusLarge: 1.28
-  colliderRadiusSmall: 0.88
+  colliderRadiusLarge: 0.5
+  colliderRadiusSmall: 0.33
   collider: {fileID: 0}
 --- !u!58 &6664876536871758964
 CircleCollider2D:
@@ -114,4 +115,23 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.88
+  m_Radius: 0.32
+--- !u!95 &2959867003966831015
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791756649546576048}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cdb2450a86e295c439b0e30c10a53244, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

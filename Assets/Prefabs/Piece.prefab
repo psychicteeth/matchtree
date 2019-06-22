@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8247252964980508978}
   - component: {fileID: 8323926460606037434}
   - component: {fileID: 1114077913724704121}
+  - component: {fileID: 8708792761181129412}
   m_Layer: 0
   m_Name: Piece
   m_TagString: Untagged
@@ -92,7 +93,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09c0817b8241bfb449626986925899fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colliderSizeLarge: 0
-  colliderSizeSmall: 0
   spriteRenderer: {fileID: 8323926460606037434}
-  collider: {fileID: 0}
+  animator: {fileID: 8708792761181129412}
+--- !u!95 &8708792761181129412
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6026610171131306739}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 227594eb383a84d40993a205184bc9aa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

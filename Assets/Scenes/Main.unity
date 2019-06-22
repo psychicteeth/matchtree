@@ -149,11 +149,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372505dd460da9342bdb5f4e27ff8699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minWidth: 10
-  maxWidth: 10
-  minHeight: 15
-  maxHeight: 15
-  minScale: 0.55
+  minWidth: 7
+  maxWidth: 7
+  minHeight: 9
+  maxHeight: 9
+  minScale: 0.75
   tilePrefab: {fileID: 3791756649546576048, guid: f1e825ae0e38ab34f9cb61b24ec13b70,
     type: 3}
   piecePrefab: {fileID: 6026610171131306739, guid: 58813ed8cbea36d4c8cd5841e2b5e1d8,
