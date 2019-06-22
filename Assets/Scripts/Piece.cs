@@ -10,6 +10,8 @@ public class Piece : MonoBehaviour
     float ySpeed = 0;
     float delayTimer = 0;
     PieceData type;
+    // Each piece also has a random leaf on it. I don't know why yet!
+    int leafIndex = 0;
 
     static float gravity = -0.9f;
     static float bounceFrictionMin = 0.2f;
@@ -19,6 +21,8 @@ public class Piece : MonoBehaviour
     // Set in prefab please
     public SpriteRenderer spriteRenderer;
     public Animator animator;
+    public SpriteRenderer leafSpriteRenderer;
+    public LeafData leafDataAsset;
 
     // state hashes
     static int hiddenStateHash = Animator.StringToHash("Hidden");
@@ -103,6 +107,9 @@ public class Piece : MonoBehaviour
         // set actual position to above so they bounce in from the top
         transform.localPosition = new Vector3(x, y + 10, 0);
         animator.Play(hiddenStateHash);
+        // choose a new leaf
+        leafIndex = leafDataAsset.leaves.GetRandomIndex();
+        leafSpriteRenderer.sprite = leafDataAsset.leaves[leafIndex];
     }
 
     void SetState(State state)

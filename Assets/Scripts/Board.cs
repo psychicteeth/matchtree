@@ -14,8 +14,9 @@ public class Board : MonoBehaviour
     // unity's regular sprite is a weird size?
     public const float spriteScale = 0.38f;
     // delays for the sequences
-    public const float removeTileDelay = 0.2f;
-
+    const float removeTileDelayMax = 0.2f;
+    const float removeTileDelayMin = 0.05f;
+    const int removeWaiterArraySize = 16;
 
     // board size
     public int minWidth;
@@ -41,9 +42,20 @@ public class Board : MonoBehaviour
     // all the different types of piece we can have
     public List<PieceData> pieceTypes;
 
-    WaitForSeconds removeTileDelayWaiter = new WaitForSeconds(removeTileDelay);
+    // for the pieces exploding. please set in editor
+    public ParticleSystem particles;
 
+    // These allocate garbage in coroutines so it's best to preallocate them.
+    // unfortunately you can't set the time after creating them so you gotta make one for every different time value you want
+    WaitForSeconds[] removeTileDelayWaiters = new WaitForSeconds[removeWaiterArraySize];
     public System.Action OnRemovePiecesSequenceComplete;
+
+    // Assign in editor please
+    public AudioClip pieceExplodeSound;
+    // I don't know how mobile audio performance is. Might be better performance-wise to have a set of various pop sounds
+    // instead of having a set of variously-pitched sources.
+    public List<AudioSource> pieceExplodeSources = new List<AudioSource>();
+    public float popVolume = 1.0f;
 
     void Awake()
     {
@@ -60,10 +72,20 @@ public class Board : MonoBehaviour
         container.name = "Pieces";
         piecesPool = new GameObjectPool(piecePrefab, maxTilesCount * 2, container);
 
-    }
+        // waiters
+        for(int i = 0; i < removeWaiterArraySize; i++)
+        {
+            removeTileDelayWaiters[i] = new WaitForSeconds(Mathf.SmoothStep(removeTileDelayMax, removeTileDelayMin, (float)i / (float)removeWaiterArraySize));
+        }
 
-    void Update()
-    {
+        // Sounds
+        for (int i = 0; i < 12; i++)
+        {
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            pieceExplodeSources.Add(source);
+            source.volume = popVolume;
+            source.pitch = Random.Range(0.9f, 1.3f);
+        }
     }
 
     public void CreateBoard()
@@ -249,6 +271,7 @@ public class Board : MonoBehaviour
 
     IEnumerator RemoveSequenceCoroutine(PieceMatches matches)
     {
+        int i = 0;
         foreach (MatchData match in matches)
         {
             Debug.Assert(match.piece != null);
@@ -259,7 +282,14 @@ public class Board : MonoBehaviour
             piecesPool.Return(tiles[x, y].contents.gameObject);
             tiles[x, y].contents = null;
 
-            yield return removeTileDelayWaiter;
+            particles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+            particles.transform.position = tiles[x, y].transform.position;
+            particles.Play();
+
+            pieceExplodeSources.GetRandom().PlayOneShot(pieceExplodeSound);
+
+            yield return removeTileDelayWaiters[i];
+            i = Mathf.Min(i + 1, removeWaiterArraySize - 1);
         }
 
         ShuffleDown(true);

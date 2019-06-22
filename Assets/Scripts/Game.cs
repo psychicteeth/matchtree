@@ -6,6 +6,7 @@ public class Game : MonoBehaviour
 {
     // Set in editor please
     public Board board;
+    public SelectionToneAudio toneAudioComponent;
 
     // for matching tiles
     Piece startingPiece;
@@ -42,6 +43,7 @@ public class Game : MonoBehaviour
         state = State.Picking;
         startingPiece = piece;
         piece.Select();
+        toneAudioComponent.PlayTone(0);
         matches.Add(piece, x, y);
     }
 
@@ -69,6 +71,9 @@ public class Game : MonoBehaviour
             {
                 match.piece.Deselect();
             }
+
+            toneAudioComponent.PlayTone(matches.Count - 1);
+
             removedItems.Clear();
         }
         else
@@ -76,6 +81,7 @@ public class Game : MonoBehaviour
             Debug.Assert(piece != null);
             Debug.Assert(board.GetTile(x,y).contents == piece);
             // otherwise, add it to the list
+            toneAudioComponent.PlayTone(matches.Count);
             matches.Add(piece, x, y);
             piece.Select();
         }
@@ -91,6 +97,8 @@ public class Game : MonoBehaviour
             // match made - remove the pieces and shuffle everything down.
             // this also fills in spaces at the top of the board with new pieces, by default
             board.RemoveSequence(matches);
+
+            toneAudioComponent.PlaySuccessChord();
 
             state = State.WaitingForTransition;
         }
@@ -114,4 +122,5 @@ public class Game : MonoBehaviour
 
         board.OnRemovePiecesSequenceComplete -= OnRemoveSequenceComplete;
     }
+
 }

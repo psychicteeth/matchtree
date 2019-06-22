@@ -47,3 +47,9 @@ TagManager:
   - name: Pieces
     uniqueID: 2688180363
     locked: 0
+  - name: Emblems
+    uniqueID: 2955873641
+    locked: 0
+  - name: Leaf particles
+    uniqueID: 3681583725
+    locked: 0

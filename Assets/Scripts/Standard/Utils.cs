@@ -32,6 +32,10 @@ public static class Extensions
     {
         return source[UnityEngine.Random.Range(0, source.Count)];
     }
+    public static int GetRandomIndex<T>(this List<T> source)
+    {
+        return UnityEngine.Random.Range(0, source.Count);
+    }
 }
 
 // C# does not allow static extension methods so we can't make UnityEngine.Random.FromEnum :(

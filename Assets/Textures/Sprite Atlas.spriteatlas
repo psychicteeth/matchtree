@@ -32,14 +32,33 @@ SpriteAtlas:
     packables:
     - {fileID: 2800000, guid: 05874c8bf7929fe45906685a616a60fd, type: 3}
     - {fileID: 2800000, guid: f4c7fd60e487ff74d9c29e18be714adc, type: 3}
-    totalSpriteSurfaceArea: 131072
+    - {fileID: 2800000, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+    totalSpriteSurfaceArea: 267406
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: f4c7fd60e487ff74d9c29e18be714adc, type: 3}
+  - {fileID: 3664983861114067704, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: -5999245757173483519, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: 827997436098469290, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: -1711180651931834051, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: 4689631791232870842, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: 2386680483698164931, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: 8116455009279416445, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: -8532703326110650893, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
+  - {fileID: 83947755850914152, guid: ed09fff176b2d6a41a5d03692c896fa5, type: 3}
   - {fileID: 21300000, guid: 05874c8bf7929fe45906685a616a60fd, type: 3}
   m_PackedSpriteNamesToIndex:
   - Tile
+  - Leaves_0
+  - Leaves_1
+  - Leaves_6
+  - Leaves_7
+  - Leaves_4
+  - Leaves_5
+  - Leaves_8
+  - Leaves_2
+  - Leaves_3
   - Piece1
   m_Tag: Sprite Atlas
   m_IsVariant: 0
