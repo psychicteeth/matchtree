@@ -19,8 +19,6 @@ public class Piece : MonoBehaviour
 
     // Set in prefab please
     public SpriteRenderer spriteRenderer;
-
-    static Board board = null;
     
     public enum State
     {
@@ -33,8 +31,6 @@ public class Piece : MonoBehaviour
 
     private void Awake()
     {
-        // assume one board in scene
-        if (board == null) board = FindObjectOfType<Board>();
     }
 
     void Update()
@@ -73,12 +69,6 @@ public class Piece : MonoBehaviour
                         {
                             // done fallin
                             state = State.Idle;
-
-                            // The reason for this code is an apparent bug in Unity where the instantiated Piece objects
-                            // do not create their colliders correctly after being set to inactive just after they are created.
-                            // Doing this apparently resets something and the colliders work properly.
-                            gameObject.SetActive(false);
-                            gameObject.SetActive(true);
                         }
                     }
                     transform.localPosition = pos;
@@ -127,14 +117,25 @@ public class Piece : MonoBehaviour
 
     public void SetPosition(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        this.x = x; // this will snap the position in x if different
+        this.y = y; // we don't support moving tiles upwards at the moment but don't assert here because it can happen in Reset
+        // kick off a falling state
+        state = State.Delay;
     }
 
     // wrapping this up in case I change how pieces record their type
     public bool IsSameType(Piece other)
     {
         return type == other.type;
+    }
+
+    public void Select()
+    {
+        spriteRenderer.color = type.highlightColor;
+    }
+    public void Deselect()
+    {
+        spriteRenderer.color = type.color;
     }
 
 }

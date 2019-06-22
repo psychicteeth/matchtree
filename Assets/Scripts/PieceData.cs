@@ -7,5 +7,6 @@ using UnityEngine;
 public class PieceData : ScriptableObject
 {
     public Color color;
+    public Color highlightColor;
     public Sprite sprite;
 }

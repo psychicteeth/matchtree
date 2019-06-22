@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Piece 2
   m_EditorClassIdentifier: 
   color: {r: 0.6037736, g: 0.36229196, b: 0.1509434, a: 1}
+  highlightColor: {r: 1, g: 1, b: 1, a: 1}
   sprite: {fileID: 21300000, guid: 05874c8bf7929fe45906685a616a60fd, type: 3}

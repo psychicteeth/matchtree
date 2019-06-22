@@ -11,6 +11,8 @@ public class Board : MonoBehaviour
     const float delayIncrement = 0.01f;
     // unity's regular sprite is a weird size?
     public const float spriteScale = 0.38f;
+    // delays for the sequences
+    public const float removeTileDelay = 0.2f;
 
     // board size
     public int minWidth;
@@ -36,13 +38,12 @@ public class Board : MonoBehaviour
     // all the different types of piece we can have
     public List<PieceData> pieceTypes;
 
-    // game code: for matching tiles
-    Piece referencePiece;
-    PieceMatches matches;
+    WaitForSeconds removeTileDelayWaiter = new WaitForSeconds(removeTileDelay);
 
-    void Start()
+    public System.Action OnRemovePiecesSequenceComplete;
+
+    void Awake()
     {
-        matches = new PieceMatches();
         GameObject container = new GameObject();
         container.transform.SetParent(transform);
         container.name = "Tiles";
@@ -56,15 +57,13 @@ public class Board : MonoBehaviour
         container.name = "Pieces";
         piecesPool = new GameObjectPool(piecePrefab, maxTilesCount * 2, container);
 
-        CreateBoard();
-        FillBoard();
     }
 
     void Update()
     {
     }
 
-    void CreateBoard()
+    public void CreateBoard()
     {
         DestroyBoard();
 
@@ -93,21 +92,9 @@ public class Board : MonoBehaviour
                 boardGOs[x, y].transform.localScale = Vector3.one * spriteScale;
             }
         }
-
-        // tie up handy references
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                if (x > 1) tiles[x, y].left = tiles[x - 1, y];
-                if (y > 1) tiles[x, y].below = tiles[x, y - 1];
-                if (x < width - 1) tiles[x, y].right = tiles[x + 1, y];
-                if (y < height - 1) tiles[x, y].above = tiles[x, y + 1];
-            }
-        }
     }
 
-    void DestroyBoard()
+    public void DestroyBoard()
     {
         for (int x = 0; x < maxBoardWidth; x++)
         {
@@ -116,7 +103,11 @@ public class Board : MonoBehaviour
                 if (boardGOs[x, y] != null)
                 {
                     // assumes that the piece component is in the root gameobject of the prefab
-                    if (tiles[x, y].contents != null) piecesPool.Return(tiles[x, y].contents.gameObject);
+                    if (tiles[x, y].contents != null)
+                    {
+                        piecesPool.Return(tiles[x, y].contents.gameObject);
+                        tiles[x, y].contents = null;
+                    }
                     tilesPool.Return(boardGOs[x, y]);
                 }
                 tiles[x, y] = null;
@@ -125,62 +116,146 @@ public class Board : MonoBehaviour
         }
     }
 
-    void FillBoard()
+    // Fills the board with random pieces.
+    public void FillBoard()
     {
         float delay = 0;
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                if (tiles[x,y] != null)
+                if (tiles[x, y] != null)
                 {
-                    // get the piece, reset it and set its location
-                    GameObject pieceGO = piecesPool.Get();
-                    Piece piece = pieceGO.GetComponent<Piece>();
-                    piece.Reset(x, y, pieceTypes.GetRandom(), delay);
+                    AddPiece(x, y, delay);
                     delay += delayIncrement;
+                }
+            }
+            delay -= delayIncrement * width / 2.0f;
+        }
+    }
 
-                    pieceGO.SetActive(true);
-                    
-                    // put the piece in the tile
-                    tiles[x, y].contents = piece;
+    // adds a piece to the board on tile at (x, y). optional delay allows for an artful entry for many simultaneous pieces
+    private void AddPiece(int x, int y, float delay = 0)
+    {
+        if (tiles[x, y].contents == null)
+        {
+            // get the piece, reset it and set its location
+            GameObject pieceGO = piecesPool.Get();
+            Piece piece = pieceGO.GetComponent<Piece>();
+            piece.Reset(x, y, pieceTypes.GetRandom(), delay);
+
+            pieceGO.SetActive(true);
+
+            // put the piece in the tile
+            tiles[x, y].contents = piece;
+        }
+    }
+
+    // instantly remove all pieces in the given match set
+    public void RemovePieces(PieceMatches matches)
+    {
+        foreach(MatchData match in matches)
+        {
+            RemovePiece(match);
+        }
+    }
+
+    private void RemovePiece(MatchData match)
+    {
+        match.piece.Deselect();
+        int x = match.x;
+        int y = match.y;
+        piecesPool.Return(tiles[x, y].contents.gameObject);
+        tiles[x, y].contents = null;
+    }
+
+    public void ShuffleDown(bool refill = true)
+    {
+        // this is still column first but should be ok
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (tiles[x, y].contents == null)
+                {
+                    // walk up and shuffle everything down
+                    int cursor = y + 1;
+                    int target = y;
+                    while (cursor < height)
+                    {
+                        Piece piece = tiles[x, cursor].contents;
+                        if (piece != null)
+                        {
+                            tiles[x, target].contents = piece;
+                            tiles[x, cursor].contents = null;
+                            piece.SetPosition(x, target);
+                            target++;
+                        }
+                        cursor++;
+                    }
+
+                    if (refill)
+                    {
+                        // walk up and pop in a new piece to remaining empty cells
+                        while (target < height)
+                        {
+                            AddPiece(x, target);
+                            target++;
+                        }
+                    }
                 }
             }
         }
     }
 
-
-    // I wanted to put the game/pieces code in a different class, but had v little time
-    void CheckForMatches()
+    public void SetSmallColliders()
     {
-        // operates a kind of floodfill to check pieces for 3 or more hits
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                CheckForMatches(x, y);
+                if (tiles[x, y] != null)
+                {
+                    tiles[x, y].SetSmallCollider();
+                }
             }
         }
     }
 
-    public void CheckForMatches(int x, int y)
+    public void SetLargeColliders()
     {
-        if (tiles[x, y] != null && tiles[x, y].contents != null)
+        for (int x = 0; x < width; x++)
         {
-            referencePiece = tiles[x, y].contents;
-
-            // recursively go through the neighbours and mark them all as matched
-            tiles[x, y].CollectSameTypeNeighbours(referencePiece, matches);
-
-            Debug.Log("Matched " + matches.Count + " tiles.");
-
-            if (matches.Count >= 3)
+            for (int y = 0; y < height; y++)
             {
-                // got a match
+                if (tiles[x, y] != null)
+                {
+                    tiles[x, y].SetLargeCollider();
+                }
             }
-
-            matches.Clear();
         }
     }
 
+    public void RemoveSequence(PieceMatches matches)
+    {
+        StartCoroutine(RemoveSequenceCoroutine(matches));
+    }
+
+    IEnumerator RemoveSequenceCoroutine(PieceMatches matches)
+    {
+        foreach (MatchData match in matches)
+        {
+            match.piece.Deselect();
+            int x = match.x;
+            int y = match.y;
+            piecesPool.Return(tiles[x, y].contents.gameObject);
+            tiles[x, y].contents = null;
+
+            yield return removeTileDelayWaiter;
+        }
+
+        ShuffleDown(true);
+
+        if (OnRemovePiecesSequenceComplete != null) OnRemovePiecesSequenceComplete.Invoke();
+    }
 }

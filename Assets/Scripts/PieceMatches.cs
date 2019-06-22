@@ -3,16 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // stores a list of matched pieces along with their locations on the board.
-public class PieceMatches
+public class PieceMatches : IEnumerable
 {
     PreallocatedList<MatchData> matchDataPool = new PreallocatedList<MatchData>(50);
-
-    public class MatchData
-    {
-        public int x;
-        public int y;
-        public Piece piece;
-    }
 
     List<MatchData> matches = new List<MatchData>();
     
@@ -36,9 +29,32 @@ public class PieceMatches
 
     public void Clear()
     {
+        foreach(MatchData match in matches)
+        {
+            match.piece.Deselect();
+        }
         matches.Clear();
         matchDataPool.Reset();
     }
 
     public int Count {  get { return matches.Count; } }
+
+    public MatchData GetEnd()
+    {
+        if (matches.Count == 0) return null;
+        return matches[matches.Count - 1];
+    }
+
+    public void RemoveAfter(Piece piece)
+    {
+        int index = matches.FindIndex((MatchData match) => { return match.piece == piece; });
+        index++;
+        if (index == matches.Count) return;
+        matches.RemoveRange(index, matches.Count - index);
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        return ((IEnumerable)matches).GetEnumerator();
+    }
 }
