@@ -56,7 +56,6 @@ public class SelectionToneAudio : MonoBehaviour
             int noteIndex = i % pitches.Length;
             float pitch = pitches[noteIndex] * octave;
             pitch *= notePitch;
-            Debug.Log(i + " " + octave + " " + noteIndex + " " + pitch);
             toneSources[i].pitch = pitch;
         }
     }
