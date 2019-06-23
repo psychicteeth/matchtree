@@ -7,6 +7,7 @@ public class GameObjectPool
 {
     // this is badly named as it reports total allocations instead of remaining objects in the pool
     public int size;
+    int maxSize;
     GameObject prefab;
     GameObject container;
     Stack<GameObject> pool = new Stack<GameObject>();
@@ -16,6 +17,8 @@ public class GameObjectPool
         this.size = 0;
         this.prefab = prefab;
         Add(size);
+        // add this as a parameter
+        maxSize = size * 2;
     }
     GameObject Make()
     {
@@ -33,7 +36,7 @@ public class GameObjectPool
     }
     public GameObject Get()
     {
-        if (pool.Count == 0)
+        if (pool.Count == 0 && size < maxSize)
         {
             Debug.Log("Adding 10 more " + prefab.name + "s!");
             Add(10);

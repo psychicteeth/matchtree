@@ -19,10 +19,6 @@ public class Board : MonoBehaviour
     const int removeWaiterArraySize = 16;
 
     // board size
-    public int minWidth;
-    public int maxWidth;
-    public int minHeight;
-    public int maxHeight;
     int width;
     int height;
 
@@ -62,10 +58,10 @@ public class Board : MonoBehaviour
     public float dripVolume = 1.0f;
 
     // dripping sounds for when the pieces bounce - only play this once per N frames max
-    int dripSoundFrameDelay = 4;
+    public int dripSoundFrameDelay = 0;
     int dripSoundFrameCounter = 0;
     bool playDripSound = false;
-
+    
     void Awake()
     {
         GameObject container = new GameObject();
@@ -109,34 +105,35 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void CreateBoard()
+    public void CreateBoard(LevelDescriptor level)
     {
         DestroyBoard();
 
-        maxWidth = Mathf.Min(maxBoardWidth, maxWidth);
-        maxHeight = Mathf.Min(maxBoardHeight, maxHeight);
-
-        width = Random.Range(minWidth, maxWidth);
-        height = Random.Range(minHeight, maxHeight);
+        width = level.width;
+        height = level.height;
 
         // scale and offset to centre
-        float scale = minScale; // just use the min scale - changing piece size might feel bad for the player's muscle memory
+        float scale = minScale; // easier just to use the min scale - also changing piece size might feel bad for the player's muscle memory?
         transform.localScale = Vector3.one * scale;
         transform.position = new Vector3(-(width - 1) / 2.0f, -(height - 1) / 2.0f, 0) * scale;
 
-        // later we'll refer to a scriptable object to define interesting shapes or do it procedurally
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                boardGOs[x, y] = tilesPool.Get();
-                tiles[x, y] = boardGOs[x, y].GetComponent<BoardTile>();
-                tiles[x, y].Reset(x, y);
-                boardGOs[x, y].SetActive(true);
-                // assume board tiles are 1x1 units
-                boardGOs[x, y].transform.localPosition = new Vector3(x, y, 0);
+                if (level.GetTile(x, y))
+                {
+                    boardGOs[x, y] = tilesPool.Get();
+                    tiles[x, y] = boardGOs[x, y].GetComponent<BoardTile>();
+                    tiles[x, y].Reset(x, y);
+                    boardGOs[x, y].SetActive(true);
+                    // assume board tiles are 1x1 world units in size
+                    boardGOs[x, y].transform.localPosition = new Vector3(x, y, 0);
+                }
             }
         }
+
+        FillBoard();
     }
 
     public void DestroyBoard()
@@ -216,28 +213,43 @@ public class Board : MonoBehaviour
 
     public void ShuffleDown(bool refill = true)
     {
-        // this is still column first but should be ok
         for (int x = 0; x < width; x++)
         {
             float delay = 0;
             for (int y = 0; y < height; y++)
             {
-                if (tiles[x, y].contents == null)
+                if (tiles[x, y] != null && tiles[x, y].contents == null)
                 {
                     // walk up and shuffle everything down
+                    // I looked at fetching tiles from adjacent columns and tried to implement it
+                    // and ran out of time.
                     int cursor = y + 1;
                     int target = y;
                     while (cursor < height)
                     {
-                        Piece piece = tiles[x, cursor].contents;
-                        if (piece != null)
+                        // if there is no tile there, Fill the tile with a new piece.
+                        if (tiles[x, cursor] == null)
                         {
-                            tiles[x, target].contents = piece;
-                            tiles[x, cursor].contents = null;
-                            piece.Fall(target, delay);
-                            target++;
+                            AddPiece(x, target, delay);
+                            // we can break out of the loop here. Algorithm will visit any squares above.
+                            break;                            
                         }
-                        cursor++;
+                        else
+                        {
+                            Piece piece = tiles[x, cursor].contents;
+                            if (piece != null)
+                            {
+                                tiles[x, target].contents = piece;
+                                tiles[x, cursor].contents = null;
+                                piece.Fall(target, delay);
+                                delay += Random.Range(delayIncrementMin, delayIncrementMax);
+                                target++;
+                            }
+                            // search further up for something to move into this tile.
+                            // if we get to the top without finding anything, we'll use target 
+                            // as a reference to fill up the holes we left
+                            cursor++;
+                        }
                     }
 
                     if (refill)
@@ -247,14 +259,16 @@ public class Board : MonoBehaviour
                         {
                             AddPiece(x, target, delay);
                             target++;
+                            if (tiles[x, target] == null) break;
                         }
                     }
-
                 }
 
-                delay += Random.Range(delayIncrementMin, delayIncrementMax);
             }
         }
+
+
+
     }
 
     // the colliders change size depending on selection state - it's to make diagonal selection easier
@@ -295,12 +309,13 @@ public class Board : MonoBehaviour
     IEnumerator RemoveSequenceCoroutine(PieceMatches matches)
     {
         int i = 0;
+        int scoreIndex = 0;
         foreach (MatchData match in matches)
         {
             Debug.Assert(match.piece != null);
 
             // inform game of this so that scores can be added etc.
-            game.OnPiecePopped(match.piece);
+            game.OnPiecePopped(match.piece, scoreIndex);
 
             int x = match.x;
             int y = match.y;
@@ -324,6 +339,9 @@ public class Board : MonoBehaviour
 
             // wait gets shorter with each pop so it speeds up
             i = Mathf.Min(i + 1, removeWaiterArraySize - 1);
+
+            // next score
+            scoreIndex++;
         }
 
         // drop all the floating pieces now

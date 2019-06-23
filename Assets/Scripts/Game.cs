@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    // when player gets enough leaves they can break all tiles with that leaf on
+    public const int maxLeafQuantity = 120;
+
     // Set in editor please
     public Board board;
     public SelectionToneAudio toneAudioComponent;
     public PlayerState playerState;
+    public LevelData levelData;
+    public ScoringData scoringData;
 
     // for matching tiles
     Piece startingPiece;
@@ -33,18 +38,27 @@ public class Game : MonoBehaviour
     public void StartNewGame()
     {
         playerState.OnStartNewGame();
-        StartNewLevel();
+        StartLevel(0);
     }
 
-    public void StartNewLevel()
+    public void StartLevel(int index)
+    {
+        StartLevel(levelData.levels[index]);
+    }
+
+    public void StartLevel(LevelDescriptor level)
     {
         playerState.OnContinueGame();
-        board.CreateBoard();
-        board.FillBoard();
+        board.CreateBoard(level);
     }
 
     void Update()
     {
+        if (state == State.Idle)
+        {
+            // check if player got enough leaves to cause a damage event
+
+        }
     }
 
     public void OnTileMouseClicked(int x, int y, Piece piece)
@@ -147,9 +161,12 @@ public class Game : MonoBehaviour
         board.OnRemovePiecesSequenceComplete -= OnRemoveSequenceComplete;
     }
 
-    public void OnPiecePopped(Piece piece)
+    public void OnPiecePopped(Piece piece, int scoreIndex)
     {
         // to-do: add leaf effects flying towards the counters and stuff here
         playerState.AddLeaves(piece.leafIndex, Random.Range(3, 6));
+        // scoring
+        playerState.score += scoringData.GetPopScore(scoreIndex);
+        // UI hint
     }
 }

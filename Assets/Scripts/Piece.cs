@@ -69,6 +69,7 @@ public class Piece : MonoBehaviour
                     // animate bouncing to destination
                     ySpeed += gravity * time;
                     Vector3 pos = transform.localPosition;
+                    pos.x = Mathf.Lerp(pos.x, x, time * 12);
                     pos.y += ySpeed;
                     if (pos.y < y)
                     {
@@ -133,7 +134,7 @@ public class Piece : MonoBehaviour
 
     public void SetPosition(int x, int y)
     {
-        this.x = x; // this will snap the position in x if different
+        this.x = x; 
         this.y = y; // we don't support moving tiles upwards but don't assert here because it can happen in Reset
     }
 

@@ -6,14 +6,19 @@ public class PlayerState : MonoBehaviour
 {
     // please set in editor
     public LeafData leafData;
-    
 
+    // saved
+    public int lastPlayedLevel { get; private set; }
     int[] leafScore;
+
+    // not saved
+    public int score;
     int numLeafTypes;
 
     // prefs save/load stuff
     List<string> leafKeys = new List<string>();
     const string gameExistsKey = "MatchTreeSaveGameExists";
+    const string lastLevelKey = "Last played level";
 
     void Start()
     {
@@ -55,6 +60,7 @@ public class PlayerState : MonoBehaviour
         {
             PlayerPrefs.SetInt(leafKeys[i], leafScore[i]);
         }
+        PlayerPrefs.SetInt(lastLevelKey, lastPlayedLevel);
     }
 
     public bool IsSaveGameAvailable()
@@ -85,5 +91,12 @@ public class PlayerState : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void OnStartedPlayingLevel(int index)
+    {
+        score = 0;
+        lastPlayedLevel = index;
+        Save();
     }
 }

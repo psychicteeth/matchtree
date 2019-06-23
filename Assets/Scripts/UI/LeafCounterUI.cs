@@ -31,6 +31,7 @@ public class LeafCounterUI : MonoBehaviour
             }
             go.transform.Find("Leaf").gameObject.GetComponent<Image>().sprite = leafData.leaves[i];
             CircleIndicator ci = go.GetComponent<CircleIndicator>();
+            ci.maxValue = Game.maxLeafQuantity;
             Debug.Assert(ci != null);
             circleUIs.Add(ci);
         }
