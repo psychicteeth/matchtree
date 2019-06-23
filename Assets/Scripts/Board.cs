@@ -22,34 +22,33 @@ public class Board : MonoBehaviour
     int width;
     int height;
 
-    // scale the board object to fit on screen based on its size
-    public float minScale = 0.28f;
-    //public float maxScale = 0.53f;
-
     // board 
     GameObjectPool tilesPool = null;
-    public GameObject tilePrefab;
     GameObject[,] boardGOs;
     BoardTile[,] tiles;
-    
-    // pieces
-    public GameObject piecePrefab;
+
+    // pool of pieces
     GameObjectPool piecesPool = null;
+
+    // Assign in editor please >>>>
+    // scale the board object to fit on screen based on its size
+    public float minScale = 0.28f;
+    public Vector2 screenOffset;
+    public GameObject tilePrefab;
+    public GameObject piecePrefab;
     // all the different types of piece we can have
     public List<PieceData> pieceTypes;
-
-    // for the pieces exploding. please set in editor
+    // for the pieces exploding.
     public ParticleSystem particles;
+    public AudioClip pieceExplodeSound;
+    public AudioClip dripSound;
+    public Game game;
+
 
     // These allocate garbage in coroutines so it's best to preallocate them.
     // unfortunately you can't set the time after creating them so you gotta make one for every different time value you want
     WaitForSeconds[] removeTileDelayWaiters = new WaitForSeconds[removeWaiterArraySize];
     public System.Action OnRemovePiecesSequenceComplete;
-
-    // Assign in editor please
-    public AudioClip pieceExplodeSound;
-    public AudioClip dripSound;
-    public Game game;
 
     // I don't know how mobile audio performance is. Might be better performance-wise to have a set of variously-pitched sound clips
     // instead of having a set of variously-pitched sources.
@@ -58,7 +57,7 @@ public class Board : MonoBehaviour
     public float dripVolume = 1.0f;
 
     // dripping sounds for when the pieces bounce - only play this once per N frames max
-    public int dripSoundFrameDelay = 0;
+    const int dripSoundFrameDelay = 1;
     int dripSoundFrameCounter = 0;
     bool playDripSound = false;
     

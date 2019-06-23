@@ -13,7 +13,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - ScoreParticles
   - 
   - 
   - 
@@ -52,4 +52,7 @@ TagManager:
     locked: 0
   - name: Leaf particles
     uniqueID: 3681583725
+    locked: 0
+  - name: Score Particles
+    uniqueID: 340154073
     locked: 0
