@@ -15,6 +15,9 @@ public class CircleIndicator : MonoBehaviour
     // Can run around several layers (e.g. first is red, second yellow etc)
     public List<Color> layerColors = new List<Color>();
 
+    // secret lerper (this is the value we use for the view)
+    float valueLerp = 0;
+
     // stashed references
     int numLayers;
     List<Image> circleImages = new List<Image>();
@@ -52,11 +55,12 @@ public class CircleIndicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        valueLerp = Mathf.Lerp(valueLerp, value, Time.deltaTime * 12);
         float band = maxValue / numLayers;
         for (int i = 0; i < numLayers; i++)
         {
             // get a value from 0 - 1 representing how much we should be showing of this ring
-            float val = Mathf.Clamp(value, band * i, band * (i + 1)) / band;
+            float val = Mathf.Clamp(valueLerp, band * i, band * (i + 1)) / band;
             val -= i;
             val = Mathf.Clamp01(val);
             // whoops I did the gradient backwards

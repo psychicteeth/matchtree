@@ -7,12 +7,12 @@ public class Board : MonoBehaviour
     public const int maxBoardWidth = 7;
     public const int maxBoardHeight = 9;
     public const int maxTilesCount = maxBoardWidth * maxBoardHeight;
+
     // delay between pieces appearing for fancy appearing at board reset
     const float delayIncrementMin = 0.02f;
     const float delayIncrementMax = 0.04f;
     const float delayIncrementColumn = 0.06f;
-    // unity's regular sprite is a weird size?
-    public const float spriteScale = 0.38f;
+
     // delays for the sequences
     const float removeTileDelayMax = 0.2f;
     const float removeTileDelayMin = 0.05f;
@@ -53,9 +53,11 @@ public class Board : MonoBehaviour
     // Assign in editor please
     public AudioClip pieceExplodeSound;
     public AudioClip dripSound;
+    public Game game;
+
     // I don't know how mobile audio performance is. Might be better performance-wise to have a set of variously-pitched sound clips
     // instead of having a set of variously-pitched sources.
-    public List<AudioSource> randomPitchSources = new List<AudioSource>();
+    List<AudioSource> randomPitchSources = new List<AudioSource>();
     public float popVolume = 1.0f;
     public float dripVolume = 1.0f;
 
@@ -255,6 +257,7 @@ public class Board : MonoBehaviour
         }
     }
 
+    // the colliders change size depending on selection state - it's to make diagonal selection easier
     public void SetSmallColliders()
     {
         for (int x = 0; x < width; x++)
@@ -288,31 +291,45 @@ public class Board : MonoBehaviour
         StartCoroutine(RemoveSequenceCoroutine(matches));
     }
 
+    // Remove a set of pieces from the board in a timed sequence
     IEnumerator RemoveSequenceCoroutine(PieceMatches matches)
     {
         int i = 0;
         foreach (MatchData match in matches)
         {
             Debug.Assert(match.piece != null);
-            match.piece.Deselect();
+
+            // inform game of this so that scores can be added etc.
+            game.OnPiecePopped(match.piece);
+
             int x = match.x;
             int y = match.y;
             Debug.Assert(tiles[x, y].contents != null);
+            
+            // return the piece to the pile - it'll get deactivated here, and reset when next requested
             piecesPool.Return(tiles[x, y].contents.gameObject);
+
+            // tile no longer contains a piece
             tiles[x, y].contents = null;
 
+            // To cause the particles to burst again they need to be stopped / moved / started
             particles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
             particles.transform.position = tiles[x, y].transform.position;
             particles.Play();
 
+            // pop sound
             randomPitchSources.GetRandom().PlayOneShot(pieceExplodeSound, popVolume);
 
             yield return removeTileDelayWaiters[i];
+
+            // wait gets shorter with each pop so it speeds up
             i = Mathf.Min(i + 1, removeWaiterArraySize - 1);
         }
 
+        // drop all the floating pieces now
         ShuffleDown(true);
 
+        // all done - let whoever wants to know know
         if (OnRemovePiecesSequenceComplete != null) OnRemovePiecesSequenceComplete.Invoke();
     }
 

@@ -11,7 +11,7 @@ public class Piece : MonoBehaviour
     float delayTimer = 0;
     PieceData type;
     // Each piece also has a random leaf on it. I don't know why yet!
-    int leafIndex = 0;
+    public int leafIndex { get; private set; }
 
     static float gravity = -0.9f;
     static float bounceFrictionMin = 0.2f;
@@ -161,5 +161,4 @@ public class Piece : MonoBehaviour
         spriteRenderer.color = type.color;
         animator.SetTrigger(deselectedHash);
     }
-
 }

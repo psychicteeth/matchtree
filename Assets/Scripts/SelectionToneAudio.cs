@@ -37,6 +37,7 @@ public class SelectionToneAudio : MonoBehaviour
     const int g1 = 11;
     const int a1 = 12;
     const int b1 = 13;
+    const int c2 = 14;
     public const float chordNoteDelay = 0.06f;
 
     public AudioSource[] toneSources;
@@ -68,10 +69,10 @@ public class SelectionToneAudio : MonoBehaviour
 
     public void PlaySuccessChord()
     {
-        StartCoroutine(PlaySuccessChordCoroutine());
+        StartCoroutine(PlaySuccessChordCoroutine(false));
     }
 
-    IEnumerator PlaySuccessChordCoroutine()
+    IEnumerator PlaySuccessChordCoroutine(bool greatSuccess)
     {
         PlayTone(c0);
         yield return chordWaiter;
@@ -80,5 +81,17 @@ public class SelectionToneAudio : MonoBehaviour
         PlayTone(g0);
         yield return chordWaiter;
         PlayTone(c1);
+        if (!greatSuccess) yield break;
+        yield return chordWaiter;
+        PlayTone(e1);
+        yield return chordWaiter;
+        PlayTone(g1);
+        yield return chordWaiter;
+        PlayTone(c2);
+    }
+
+    public void PlayGreatSuccessChord()
+    {
+        StartCoroutine(PlaySuccessChordCoroutine(true));
     }
 }

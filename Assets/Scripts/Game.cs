@@ -7,6 +7,7 @@ public class Game : MonoBehaviour
     // Set in editor please
     public Board board;
     public SelectionToneAudio toneAudioComponent;
+    public PlayerState playerState;
 
     // for matching tiles
     Piece startingPiece;
@@ -102,7 +103,15 @@ public class Game : MonoBehaviour
             // this also fills in spaces at the top of the board with new pieces, by default
             board.RemoveSequence(matches);
 
-            toneAudioComponent.PlaySuccessChord();
+            // if you get to the top note we play a longer musical sequence
+            if (matches.Count >= 15)
+            {
+                toneAudioComponent.PlayGreatSuccessChord();
+            }
+            else
+            {
+                toneAudioComponent.PlaySuccessChord();
+            }
 
             state = State.WaitingForTransition;
         }
@@ -127,4 +136,9 @@ public class Game : MonoBehaviour
         board.OnRemovePiecesSequenceComplete -= OnRemoveSequenceComplete;
     }
 
+    public void OnPiecePopped(Piece piece)
+    {
+        // to-do: add leaf effects flying towards the counters and stuff here
+        playerState.AddLeaves(piece.leafIndex, Random.Range(3, 6));
+    }
 }
