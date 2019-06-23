@@ -13,6 +13,7 @@ public class Game : MonoBehaviour
     public PlayerState playerState;
     public LevelData levelData;
     public ScoringData scoringData;
+    public ScoreParticles scoreParticles;
 
     // for matching tiles
     Piece startingPiece;
@@ -166,7 +167,9 @@ public class Game : MonoBehaviour
         // to-do: add leaf effects flying towards the counters and stuff here
         playerState.AddLeaves(piece.leafIndex, Random.Range(3, 6));
         // scoring
-        playerState.score += scoringData.GetPopScore(scoreIndex);
+        int addScore = scoringData.GetPopScore(scoreIndex);
+        playerState.score += addScore;
         // UI hint
+        scoreParticles.SpawnParticle(piece.transform.position, addScore);
     }
 }

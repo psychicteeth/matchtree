@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Pre-allocates GameObjects from a given prefab. Get one using Get(). Please Return() them when you are done.
-public class GameObjectPool
+public class GameObjectPool : IEnumerable
 {
     // this is badly named as it reports total allocations instead of remaining objects in the pool
     public int size;
@@ -49,5 +49,10 @@ public class GameObjectPool
     {
         pool.Push(go);
         go.SetActive(false);
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        return ((IEnumerable)pool).GetEnumerator();
     }
 }

@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 724581dc2522f434e907f25bcf73e9aa, type: 3}
+  m_Name: Scoring
+  m_EditorClassIdentifier: 
+  bubblePopChainScores: 0a000000140000001e000000320000004b0000006400000096000000c8000000fa0000009001000058020000e8030000dc050000d0070000ac0d000088130000

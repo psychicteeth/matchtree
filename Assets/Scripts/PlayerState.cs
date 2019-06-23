@@ -12,7 +12,7 @@ public class PlayerState : MonoBehaviour
     int[] leafScore;
 
     // not saved
-    public int score;
+    public long score;
     int numLeafTypes;
 
     // prefs save/load stuff
