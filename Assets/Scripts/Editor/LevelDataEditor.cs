@@ -67,7 +67,7 @@ public class LevelDataEditor : Editor
                 int h = height.intValue;
 
                 SerializedProperty map = level.FindPropertyRelative("map");
-                for (int y = 0; y < h; y++)
+                for (int y = h - 1; y >= 0; y--)
                 {
                     Rect r = EditorGUILayout.GetControlRect(false, 16, GUILayout.Width(16));
                     for (int x = 0; x < w; x++)
