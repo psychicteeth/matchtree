@@ -41,12 +41,12 @@ public static class Extensions
     }
     public static T GetRandom<T>(this List<T> source, int min, int max)
     {
-        Debug.Assert(min > 0 && min < source.Count);
-        Debug.Assert(max > 0 && max < source.Count);
-        Debug.Assert(min < max);
+        Debug.Assert(min >= 0 && min <= source.Count, "min: " + min + " limit: " + source.Count);
+        Debug.Assert(max >= 0 && max <= source.Count, "max: " + max + " limit: " + source.Count);
+        Debug.Assert(min <= max);
         // probably don't want to crash in this situ
-        min = Utils.Clamp(min, 0, source.Count - 1);
-        max = Utils.Clamp(max, 0, source.Count - 1);
+        min = Utils.Clamp(min, 0, source.Count);
+        max = Utils.Clamp(max, 0, source.Count);
         return source[UnityEngine.Random.Range(min, max)];
     }
     public static int GetRandomIndex<T>(this List<T> source)

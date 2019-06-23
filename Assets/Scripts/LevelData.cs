@@ -18,6 +18,7 @@ public class LevelDescriptor
     public int numLeaves = 9;
     public int width = Board.maxBoardWidth;
     public int height = Board.maxBoardHeight;
+    public List<Goal> goals;
     public bool[] map = new bool[Board.maxBoardWidth * Board.maxBoardHeight];
     public LevelDescriptor()
     {

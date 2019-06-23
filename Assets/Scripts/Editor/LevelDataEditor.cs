@@ -12,6 +12,8 @@ public class LevelDataEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        float labelWidth = EditorGUIUtility.labelWidth;
+        EditorGUIUtility.labelWidth = 80;
         LevelData levelData = (LevelData)target;
         serializedObject.Update();
 
@@ -49,25 +51,76 @@ public class LevelDataEditor : Editor
                 {
                     SerializedProperty numColors = level.FindPropertyRelative("numColors");
                     SerializedProperty numLeaves = level.FindPropertyRelative("numLeaves");
-
-                    // for some reason Unity isn't displaying these as sliders
+                    
                     EditorGUILayout.IntSlider(numColors, 2, 5);
                     EditorGUILayout.IntSlider(numLeaves, 4, 9);
                 }
                 EditorGUILayout.EndHorizontal();
-
 
                 SerializedProperty width = level.FindPropertyRelative("width");
                 SerializedProperty height = level.FindPropertyRelative("height");
 
                 EditorGUILayout.BeginHorizontal();
                 {
-
-                    // for some reason Unity isn't displaying these as sliders
                     EditorGUILayout.IntSlider(width, 5, Board.maxBoardWidth);
                     EditorGUILayout.IntSlider(height, 5, Board.maxBoardHeight);
                 }
                 EditorGUILayout.EndHorizontal();
+
+                SerializedProperty goals = level.FindPropertyRelative("goals");
+
+                EditorGUILayout.BeginVertical();
+                {
+                    int removeGoal = -1;
+                    for (int j = 0; j < goals.arraySize; j++)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        SerializedProperty goal = goals.GetArrayElementAtIndex(j);
+                        SerializedProperty type = goal.FindPropertyRelative("type");
+
+                        EditorGUILayout.PropertyField(type);
+                        switch (type.enumValueIndex)
+                        {
+                            case 0:
+                                {
+                                    // score only
+                                    SerializedProperty score = goal.FindPropertyRelative("scoreLimit");
+                                    EditorGUILayout.PropertyField(score);
+                                }
+                                break;
+
+                            case 1:
+                                {
+                                    // score and time
+                                    SerializedProperty score = goal.FindPropertyRelative("scoreLimit");
+                                    EditorGUILayout.PropertyField(score);
+                                    SerializedProperty time = goal.FindPropertyRelative("timeLimit");
+                                    EditorGUILayout.PropertyField(time);
+
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (GUILayout.Button("X", GUILayout.Width(20)))
+                        {
+                            removeGoal = i;
+                        }
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                    if (removeGoal != -1)
+                    {
+                        levelData.levels[i].goals.RemoveAt(removeGoal);
+                    }
+                }
+                EditorGUILayout.EndVertical();
+
+                if (GUILayout.Button("New goal"))
+                {
+                    levelData.levels[i].goals.Add(new Goal());
+                }
 
                 int w = width.intValue;
                 int h = height.intValue;
@@ -112,5 +165,7 @@ public class LevelDataEditor : Editor
         {
             serializedObject.ApplyModifiedProperties();
         }
+
+        EditorGUIUtility.labelWidth = labelWidth;
     }
 }

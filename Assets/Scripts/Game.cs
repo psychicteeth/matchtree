@@ -14,6 +14,9 @@ public class Game : MonoBehaviour
     public LevelData levelData;
     public ScoringData scoringData;
     public ScoreParticles scoreParticles;
+    public TMPro.TMP_Text scoreValueText;
+    // really need to make a UI state controller instead of having all these disparate things turning objects on and off
+    public GameObject levelCompleteUI;
 
     // for matching tiles
     Piece startingPiece;
@@ -21,6 +24,9 @@ public class Game : MonoBehaviour
 
     // stores results from the piece matcher
     List<MatchData> removedItems = new List<MatchData>();
+
+    // store current level for evaluating goals
+    LevelDescriptor currentLevel;
 
     enum State
     {
@@ -31,6 +37,9 @@ public class Game : MonoBehaviour
 
     State state;
 
+    // score lerper
+    long scoreLerp;
+
     void Start()
     {
         matches = new PieceMatches();
@@ -39,16 +48,19 @@ public class Game : MonoBehaviour
     public void StartNewGame()
     {
         playerState.OnStartNewGame();
-        StartLevel(0);
     }
 
     public void StartLevel(int index)
     {
+        playerState.OnStartedPlayingLevel(index);
         StartLevel(levelData.levels[index]);
     }
 
     public void StartLevel(LevelDescriptor level)
     {
+        currentLevel = level;
+        scoreLerp = 0;
+        scoreValueText.text = scoreLerp.ToString("D6");
         playerState.OnContinueGame();
         board.CreateBoard(level);
     }
@@ -59,6 +71,29 @@ public class Game : MonoBehaviour
         {
             // check if player got enough leaves to cause a damage event
 
+        }
+
+        if (playerState.score != scoreLerp)
+        {
+            // lerp score and update display
+            long diff = playerState.score - scoreLerp;
+            diff /= 2;
+            // assumes score always goes up
+            if (diff < 1) diff = 1;
+            scoreLerp += diff;
+            scoreValueText.text = scoreLerp.ToString("D6");
+        }
+
+        // evaluate goals
+        bool complete = true;
+        foreach (Goal goal in currentLevel.goals)
+        {
+            if (!goal.Evaluate(playerState))
+                complete = false;
+        }
+        if (complete)
+        {
+            OnLevelComplete();
         }
     }
 
@@ -171,5 +206,11 @@ public class Game : MonoBehaviour
         playerState.score += addScore;
         // UI hint
         scoreParticles.SpawnParticle(piece.transform.position, addScore);
+    }
+
+    void OnLevelComplete()
+    {
+        playerState.SaveScore();
+        levelCompleteUI.SetActive(true);
     }
 }

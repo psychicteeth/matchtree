@@ -94,6 +94,8 @@ public class Board : MonoBehaviour
             randomPitchSources.Add(source);
             source.pitch = Random.Range(0.9f, 1.3f);
         }
+
+        gameObject.SetActive(false);
     }
 
     // do the drip sound in late update as the pieces update in update and we want to play the sounds on the same frame if poss

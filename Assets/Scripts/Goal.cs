@@ -9,16 +9,25 @@ public class Goal
     public enum Type
     {
         ReachScore,
-        FillLeafMeters,
         ReachScoreInTime,
     }
+    public Type type;
 
     public float timeLimit;
-    public int scoreLimit;
+    public long scoreLimit;
 
     // returns true if this goal has been fulfilled
     public bool Evaluate(PlayerState state)
     {
+        switch (type)
+        {
+            case Type.ReachScore:
+                return (state.score >= scoreLimit);
+            case Type.ReachScoreInTime:
+                return (state.score >= scoreLimit);
+            default:
+                break;
+        }
         return true;
     }
 }

@@ -19,6 +19,7 @@ public class PlayerState : MonoBehaviour
     List<string> leafKeys = new List<string>();
     const string gameExistsKey = "MatchTreeSaveGameExists";
     const string lastLevelKey = "Last played level";
+    const string scoreKey = "Score ";
 
     void Start()
     {
@@ -46,11 +47,26 @@ public class PlayerState : MonoBehaviour
 
     public void Reset()
     {
+        PlayerPrefs.DeleteAll();
         for (int i = 0; i < numLeafTypes; i++)
         {
             leafScore[i] = 0;
         }
         Save();
+    }
+
+    public void SaveScore()
+    {
+        Save();
+        string scoreLevelKey = scoreKey + lastPlayedLevel;
+        PlayerPrefs.SetString(scoreLevelKey, score.ToString());
+    }
+
+    public string GetScoreStringForLevel(int levelIndex)
+    {
+        string scoreLevelKey = scoreKey + levelIndex;
+        if (!PlayerPrefs.HasKey(scoreLevelKey)) return "-";
+        return PlayerPrefs.GetString(scoreLevelKey);
     }
 
     public void Save()

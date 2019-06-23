@@ -8,6 +8,8 @@ public class LevelSelectUI : MonoBehaviour
     // set in editor
     public PlayerState playerState;
     public TMP_Text levelNameLabel;
+    public TMP_Text scoreValueLabel;
+    public TMP_Text targetValueLabel;
     public GameObject prevButton;
     public GameObject nextButton;
     public LevelData levelData;
@@ -29,7 +31,12 @@ public class LevelSelectUI : MonoBehaviour
     private void UpdateLevel()
     {
         levelNameLabel.text = "Level " + (selectedLevel + 1);
-        // to-do: load high score from player state
+
+        // to-do: we should display (and save) time for score-based levels and score for time based levels
+        scoreValueLabel.text = playerState.GetScoreStringForLevel(selectedLevel);
+
+        // to-do: this assumes there is a goal, and assumes there is only one goal, and assumes that it is score based
+        targetValueLabel.text = levelData.levels[selectedLevel].goals[0].scoreLimit.ToString();
     }
 
     public void Play()
