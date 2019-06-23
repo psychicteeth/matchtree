@@ -99,7 +99,7 @@ MonoBehaviour:
   y: 0
   colliderRadiusLarge: 0.5
   colliderRadiusSmall: 0.38
-  collider: {fileID: 0}
+  inputCollider: {fileID: 6664876536871758964}
 --- !u!58 &6664876536871758964
 CircleCollider2D:
   m_ObjectHideFlags: 0

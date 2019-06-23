@@ -33,7 +33,7 @@ public class Board : MonoBehaviour
     // Assign in editor please >>>>
     // scale the board object to fit on screen based on its size
     public float minScale = 0.28f;
-    public Vector2 screenOffset;
+    public Vector3 screenOffset;
     public GameObject tilePrefab;
     public GameObject piecePrefab;
     // all the different types of piece we can have
@@ -57,10 +57,15 @@ public class Board : MonoBehaviour
     public float dripVolume = 1.0f;
 
     // dripping sounds for when the pieces bounce - only play this once per N frames max
-    const int dripSoundFrameDelay = 1;
+    const int dripSoundFrameDelayMin = 0;
+    const int dripSoundFrameDelayMax = 3;
     int dripSoundFrameCounter = 0;
     bool playDripSound = false;
-    
+
+    // keep ahold of the current level 
+    LevelDescriptor currentLevel;
+
+
     void Awake()
     {
         GameObject container = new GameObject();
@@ -99,13 +104,15 @@ public class Board : MonoBehaviour
         if (playDripSound && dripSoundFrameCounter == 0)
         {
             playDripSound = false;
-            dripSoundFrameCounter = dripSoundFrameDelay;
+            dripSoundFrameCounter = Random.Range(dripSoundFrameDelayMin, dripSoundFrameDelayMax);
             randomPitchSources.GetRandom().PlayOneShot(dripSound, dripVolume);
         }
     }
 
     public void CreateBoard(LevelDescriptor level)
     {
+        currentLevel = level;
+
         DestroyBoard();
 
         width = level.width;
@@ -114,7 +121,7 @@ public class Board : MonoBehaviour
         // scale and offset to centre
         float scale = minScale; // easier just to use the min scale - also changing piece size might feel bad for the player's muscle memory?
         transform.localScale = Vector3.one * scale;
-        transform.position = new Vector3(-(width - 1) / 2.0f, -(height - 1) / 2.0f, 0) * scale;
+        transform.position = new Vector3(-(width - 1) / 2.0f, -(height - 1) / 2.0f, 0) * scale + screenOffset;
 
         for (int x = 0; x < width; x++)
         {
@@ -185,7 +192,7 @@ public class Board : MonoBehaviour
 
             pieceGO.SetActive(true);
 
-            piece.Reset(x, y, pieceTypes.GetRandom(), delay);
+            piece.Reset(x, y, pieceTypes.GetRandom(0, currentLevel.numColors), Random.Range(0, currentLevel.numLeaves), delay);
 
             // put the piece in the tile
             tiles[x, y].contents = piece;
@@ -262,12 +269,8 @@ public class Board : MonoBehaviour
                         }
                     }
                 }
-
             }
         }
-
-
-
     }
 
     // the colliders change size depending on selection state - it's to make diagonal selection easier

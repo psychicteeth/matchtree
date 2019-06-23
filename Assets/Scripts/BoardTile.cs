@@ -17,7 +17,7 @@ public class BoardTile : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     public float colliderRadiusSmall;
 
     // set in prefab please!
-    new public CircleCollider2D collider;
+    public CircleCollider2D inputCollider; 
 
     void Start()
     {
@@ -52,10 +52,10 @@ public class BoardTile : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
     public void SetSmallCollider()
     {
-        collider.radius = colliderRadiusSmall;
+        inputCollider.radius = colliderRadiusSmall;
     }
     public void SetLargeCollider()
     {
-        collider.radius = colliderRadiusLarge;
+        inputCollider.radius = colliderRadiusLarge;
     }
 }

@@ -102,7 +102,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    public void Reset(int x, int y, PieceData type, float delay)
+    public void Reset(int x, int y, PieceData type, int leafIndex, float delay)
     {
         // was gonna use a coroutine for the delay but decided to use state instead
         // lets me do subframe counting
@@ -115,7 +115,7 @@ public class Piece : MonoBehaviour
         transform.localPosition = new Vector3(x, y + 10, 0);
         animator.Play(hiddenStateHash);
         // choose a new leaf
-        leafIndex = leafDataAsset.leaves.GetRandomIndex();
+        this.leafIndex = leafIndex;
         leafSpriteRenderer.sprite = leafDataAsset.leaves[leafIndex];
     }
 

@@ -19,6 +19,13 @@ public static class Utils
     }
 
     public static long GetTicks() { return System.DateTime.Now.Ticks; }
+
+    public static int Clamp(int value, int min, int max)
+    {
+        if (value < min) value = min;
+        if (value > max) value = max;
+        return value;
+    }
 }
 
 public static class Extensions
@@ -31,6 +38,16 @@ public static class Extensions
     public static T GetRandom<T>(this List<T> source)
     {
         return source[UnityEngine.Random.Range(0, source.Count)];
+    }
+    public static T GetRandom<T>(this List<T> source, int min, int max)
+    {
+        Debug.Assert(min > 0 && min < source.Count);
+        Debug.Assert(max > 0 && max < source.Count);
+        Debug.Assert(min < max);
+        // probably don't want to crash in this situ
+        min = Utils.Clamp(min, 0, source.Count - 1);
+        max = Utils.Clamp(max, 0, source.Count - 1);
+        return source[UnityEngine.Random.Range(min, max)];
     }
     public static int GetRandomIndex<T>(this List<T> source)
     {

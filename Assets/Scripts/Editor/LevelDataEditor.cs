@@ -20,6 +20,7 @@ public class LevelDataEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         int toDelete = -1;
+        int toMoveUp = -1;
 
         for (int i = 0; i < levels.arraySize; i++)
         {
@@ -32,6 +33,11 @@ public class LevelDataEditor : Editor
                 if (GUILayout.Button("X"))
                 {
                     toDelete = i;
+                }
+                // move this level up
+                if (i > 0 && GUILayout.Button("Move up"))
+                {
+                    toMoveUp = i;
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -95,6 +101,11 @@ public class LevelDataEditor : Editor
         if (toDelete != -1)
         { 
             levels.DeleteArrayElementAtIndex(toDelete);
+        }
+
+        if (toMoveUp != -1)
+        {
+            levels.MoveArrayElement(toMoveUp, toMoveUp - 1);
         }
 
         if (EditorGUI.EndChangeCheck())
