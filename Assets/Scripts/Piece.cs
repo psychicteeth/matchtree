@@ -155,10 +155,12 @@ public class Piece : MonoBehaviour
     {
         spriteRenderer.color = type.highlightColor;
         animator.SetTrigger(selectedHash);
+        animator.ResetTrigger(deselectedHash);
     }
     public void Deselect()
     {
         spriteRenderer.color = type.color;
         animator.SetTrigger(deselectedHash);
+        animator.ResetTrigger(selectedHash);
     }
 }

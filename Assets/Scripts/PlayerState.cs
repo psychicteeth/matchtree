@@ -13,22 +13,17 @@ public class PlayerState : MonoBehaviour
 
     // prefs save/load stuff
     List<string> leafKeys = new List<string>();
-
+    const string gameExistsKey = "MatchTreeSaveGameExists";
 
     void Start()
     {
         numLeafTypes = leafData.leaves.Count;
         leafScore = new int[numLeafTypes];
 
-        // load from profile
         for (int i = 0; i < numLeafTypes; i++)
         {
             string key = "leafScore" + i;
             leafKeys.Add(key);
-            if (PlayerPrefs.HasKey(key))
-            {
-                leafScore[i] = PlayerPrefs.GetInt(key);
-            }
         }
     }
 
@@ -42,5 +37,53 @@ public class PlayerState : MonoBehaviour
     public int GetLeafCount(int leafType)
     {
         return leafScore[leafType];
+    }
+
+    public void Reset()
+    {
+        for (int i = 0; i < numLeafTypes; i++)
+        {
+            leafScore[i] = 0;
+        }
+        Save();
+    }
+
+    public void Save()
+    {
+        PlayerPrefs.SetInt(gameExistsKey, 1);
+        for (int i = 0; i < numLeafTypes; i++)
+        {
+            PlayerPrefs.SetInt(leafKeys[i], leafScore[i]);
+        }
+    }
+
+    public bool IsSaveGameAvailable()
+    {
+        return PlayerPrefs.GetInt(gameExistsKey) == 1;
+    }
+
+    public void OnStartNewGame()
+    {
+        Reset();
+        Save();
+    }
+
+    public void OnContinueGame()
+    {
+        if (IsSaveGameAvailable())
+        {
+            // load from profile
+            for (int i = 0; i < numLeafTypes; i++)
+            {
+                if (PlayerPrefs.HasKey(leafKeys[i]))
+                {
+                    leafScore[i] = PlayerPrefs.GetInt(leafKeys[i]);
+                }
+                else
+                {
+                    leafScore[i] = 0;
+                }
+            }
+        }
     }
 }

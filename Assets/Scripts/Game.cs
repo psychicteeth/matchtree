@@ -28,10 +28,21 @@ public class Game : MonoBehaviour
     void Start()
     {
         matches = new PieceMatches();
+    }
+
+    public void StartNewGame()
+    {
+        playerState.OnStartNewGame();
+        StartNewLevel();
+    }
+
+    public void StartNewLevel()
+    {
+        playerState.OnContinueGame();
         board.CreateBoard();
         board.FillBoard();
     }
-    
+
     void Update()
     {
     }

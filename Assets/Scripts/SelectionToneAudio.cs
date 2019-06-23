@@ -20,6 +20,7 @@ public class SelectionToneAudio : MonoBehaviour
     };
     static readonly int numNotes = pitches.Length * 2 + 1;
     public float notePitch = 0.5f;
+    public float noteVolume = 0.8f;
 
     // these are a bit naughtily named but I couldn't resist. 
     // Could do an enum but then people can't pass in whatever int they like to PlayTone
@@ -64,7 +65,7 @@ public class SelectionToneAudio : MonoBehaviour
     public void PlayTone(int note)
     {
         note = Mathf.Max(0, Mathf.Min(note, toneSources.Length - 1));
-        toneSources[note].PlayOneShot(selectPieceTone);
+        toneSources[note].PlayOneShot(selectPieceTone, noteVolume);
     }
 
     public void PlaySuccessChord()

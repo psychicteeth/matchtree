@@ -43,11 +43,13 @@ public class CircleIndicator : MonoBehaviour
             image.material.SetFloat(cutoffID, 0);
             circleImages.Add(image);
             // put successive rings in front of one another
-            Vector3 pos = image.transform.localPosition;
+            RectTransform rt = image.GetComponent<RectTransform>();
+            Vector3 pos = rt.anchoredPosition3D;
+            pos.x = pos.y = 0;
             pos.z = z;
+            rt.anchoredPosition3D = pos;
+            rt.sizeDelta = Vector2.zero;
             z += 1;
-            // also recenter it to the parent
-            image.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
         }
     }
