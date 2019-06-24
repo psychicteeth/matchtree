@@ -46,7 +46,7 @@ public class Game : MonoBehaviour
     long scoreLerp;
 
     // Fail waiter
-    WaitForSeconds failWaitDelay = new WaitForSeconds(0.5f);
+    WaitForSeconds failWaitDelay = new WaitForSeconds(2.0f);
 
     void Start()
     {
@@ -242,7 +242,7 @@ public class Game : MonoBehaviour
         if (longestMatch < 3)
         {
             // set the fail screen on but only after a little while
-            StartCoroutine()
+            StartCoroutine(OpenFailScreen());
         }
     }
 
