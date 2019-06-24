@@ -19,8 +19,8 @@ public class Board : MonoBehaviour
     const int removeWaiterArraySize = 16;
 
     // board size
-    int width;
-    int height;
+    public int width { get; private set; }
+    public int height { get; private set; }
 
     // board 
     GameObjectPool tilesPool = null;
@@ -49,6 +49,7 @@ public class Board : MonoBehaviour
     // unfortunately you can't set the time after creating them so you gotta make one for every different time value you want
     WaitForSeconds[] removeTileDelayWaiters = new WaitForSeconds[removeWaiterArraySize];
     public System.Action OnRemovePiecesSequenceComplete;
+    public System.Action OnBoardStateChanged;
 
     // I don't know how mobile audio performance is. Might be better performance-wise to have a set of variously-pitched sound clips
     // instead of having a set of variously-pitched sources.
@@ -64,7 +65,6 @@ public class Board : MonoBehaviour
 
     // keep ahold of the current level 
     LevelDescriptor currentLevel;
-
 
     void Awake()
     {
@@ -352,6 +352,7 @@ public class Board : MonoBehaviour
         ShuffleDown(true);
 
         // all done - let whoever wants to know know
+        if (OnBoardStateChanged != null) OnBoardStateChanged.Invoke();
         if (OnRemovePiecesSequenceComplete != null) OnRemovePiecesSequenceComplete.Invoke();
     }
 
@@ -363,5 +364,13 @@ public class Board : MonoBehaviour
     public void PlayDripSound()
     {
         playDripSound = true;
+    }
+
+    public Piece GetPiece(int x, int y)
+    {
+        if (x < 0 || x >= width || y < 0 || y >= width) return null;
+        BoardTile tile = GetTile(x, y);
+        if (tile == null) return null;
+        return tile.contents;
     }
 }

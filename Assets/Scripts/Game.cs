@@ -17,13 +17,18 @@ public class Game : MonoBehaviour
     public TMPro.TMP_Text scoreValueText;
     // really need to make a UI state controller instead of having all these disparate things turning objects on and off
     public GameObject levelCompleteUI;
+    public GameObject levelFailedUI;
 
     // for matching tiles
     Piece startingPiece;
     PieceMatches matches;
+    List<Piece> pieceSearchCache = new List<Piece>();
 
     // stores results from the piece matcher
     List<MatchData> removedItems = new List<MatchData>();
+
+    // nothing to do with the PieceMatches class, this searches for the longest possible match for a given piece
+    PieceMatchSearchTree longestMatchFinder = new PieceMatchSearchTree();
 
     // store current level for evaluating goals
     LevelDescriptor currentLevel;
@@ -42,7 +47,9 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        longestMatchFinder.board = board;
         matches = new PieceMatches();
+        board.OnBoardStateChanged += EvaluateFailState;
     }
 
     public void StartNewGame()
@@ -84,7 +91,7 @@ public class Game : MonoBehaviour
             scoreValueText.text = scoreLerp.ToString("D6");
         }
 
-        // evaluate goals
+        // evaluate goals - can do this on a callback when the game state changes
         bool complete = true;
         foreach (Goal goal in currentLevel.goals)
         {
@@ -95,6 +102,7 @@ public class Game : MonoBehaviour
         {
             OnLevelComplete();
         }
+
     }
 
     public void OnTileMouseClicked(int x, int y, Piece piece)
@@ -212,5 +220,25 @@ public class Game : MonoBehaviour
     {
         playerState.SaveScore();
         levelCompleteUI.SetActive(true);
+    }
+
+    void EvaluateFailState()
+    {
+        int longestMatch = 0;
+        for (int x = 0; x < board.width; x++)
+        {
+            for (int y = 0; y < board.height; y++)
+            {
+                Piece piece = board.GetPiece(x, y);
+                if (piece != null)
+                {
+                    longestMatch = Mathf.Max(longestMatch, longestMatchFinder.Search(piece, 3));
+                }
+            }
+        }
+        if (longestMatch < 3)
+        {
+            levelFailedUI.SetActive(true);
+        }
     }
 }

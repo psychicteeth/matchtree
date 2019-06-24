@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class Piece : MonoBehaviour
 {
-    int x;
-    int y;
+    public int x { get; private set; }
+    public int y { get; private set; }
     float ySpeed = 0;
     float delayTimer = 0;
     PieceData type;

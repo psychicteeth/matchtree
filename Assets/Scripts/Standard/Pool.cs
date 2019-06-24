@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // A stack which can automatically allocate new items if it runs out
+// It is the user's responsibility to return items to the stack once they are done with them
 public class Pool<T> where T : new()
 {
     int sizeIncrease;
