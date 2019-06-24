@@ -245,7 +245,7 @@ public class Game : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Longest match found (max 3): " + longestMatch);
+        //Debug.Log("Longest match found (max 3): " + longestMatch);
         if (longestMatch < 3)
         {
             // set the fail screen on but only after a little while

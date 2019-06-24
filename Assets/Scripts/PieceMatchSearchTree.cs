@@ -20,7 +20,7 @@ public class PieceMatchSearchTree
     public int Search(Piece startingPiece, int maxMatchLength)
     {
         // removed temp for debugging
-        //this.maxMatchLength = maxMatchLength;
+        this.maxMatchLength = maxMatchLength;
 
         if (startingPiece.hp <= 0) return 0;
 
@@ -35,7 +35,7 @@ public class PieceMatchSearchTree
 
     void SearchRecursive(Piece piece)
     {
-        //if (largestMatch > maxMatchLength) return;
+        if (largestMatch > maxMatchLength) return;
         // given a Piece
         // add it to the match list
         currentMatch.Add(piece);
