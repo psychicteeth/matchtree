@@ -19,6 +19,13 @@ public class PieceMatchSearchTree
     // evaluate (300ms+)
     public int Search(Piece startingPiece, int maxMatchLength)
     {
+        // removed temp for debugging
+        //this.maxMatchLength = maxMatchLength;
+
+        if (startingPiece.hp <= 0) return 0;
+
+        currentMatch.Clear();
+
         largestMatch = 0;
         // recursive function
         SearchRecursive(startingPiece);
@@ -28,7 +35,7 @@ public class PieceMatchSearchTree
 
     void SearchRecursive(Piece piece)
     {
-        if (largestMatch > maxMatchLength) return;
+        //if (largestMatch > maxMatchLength) return;
         // given a Piece
         // add it to the match list
         currentMatch.Add(piece);
@@ -40,7 +47,7 @@ public class PieceMatchSearchTree
             for (int y = py - 1; y <= py + 1; y++)
             {
                 Piece p = board.GetPiece(x, y);
-                if (p != null && p != piece && p.IsSameType(piece) && !currentMatch.Contains(p))
+                if (p != null && p != piece && p.hp > 0 && p.Matches(piece) && !currentMatch.Contains(p))
                 {
                     SearchRecursive(p);
                 }

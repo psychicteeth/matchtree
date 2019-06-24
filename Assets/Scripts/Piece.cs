@@ -12,6 +12,8 @@ public class Piece : MonoBehaviour
     PieceData type;
     // Each piece also has a random leaf on it. I don't know why yet!
     public int leafIndex { get; private set; }
+    // each piece has a hp score, which translates to lifetime in turns, before it turns to garbage and can't be used in matches
+    public int hp { get; private set; }
 
     static float gravity = -0.9f;
     static float bounceFrictionMin = 0.2f;
@@ -117,6 +119,8 @@ public class Piece : MonoBehaviour
         // choose a new leaf
         this.leafIndex = leafIndex;
         leafSpriteRenderer.sprite = leafDataAsset.leaves[leafIndex];
+        // temp, just randomixe the hp
+        hp = Random.Range(5, 10);
     }
 
     void SetState(State state)
@@ -146,7 +150,13 @@ public class Piece : MonoBehaviour
         delayTimer = delay;
     }
 
-    // wrapping this up in case I change how pieces record their type
+    public bool Matches(Piece other)
+    {        
+        if (hp <= 0) return false;
+        if (other.hp <= 0) return false;
+        return IsSameType(other);
+    }
+
     public bool IsSameType(Piece other)
     {
         return type == other.type;
@@ -163,5 +173,14 @@ public class Piece : MonoBehaviour
         spriteRenderer.color = type.color;
         animator.SetTrigger(deselectedHash);
         animator.ResetTrigger(selectedHash);
+    }
+
+    public void OnTurn()
+    {
+        hp--;
+        if (hp <= 0)
+        {            
+            spriteRenderer.color = Color.black;
+        }
     }
 }

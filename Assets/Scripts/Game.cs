@@ -37,7 +37,8 @@ public class Game : MonoBehaviour
     {
         Idle,
         Picking,
-        WaitingForTransition
+        WaitingForTransition,
+        Fail
     }
 
     State state;
@@ -52,6 +53,7 @@ public class Game : MonoBehaviour
     {
         longestMatchFinder.board = board;
         matches = new PieceMatches();
+        board.OnBoardStateChanged += OnTurn;
         board.OnBoardStateChanged += EvaluateFailState;
     }
 
@@ -68,6 +70,7 @@ public class Game : MonoBehaviour
 
     public void StartLevel(LevelDescriptor level)
     {
+        state = State.Idle;
         currentLevel = level;
         scoreLerp = 0;
         scoreValueText.text = scoreLerp.ToString("D6");
@@ -77,11 +80,6 @@ public class Game : MonoBehaviour
 
     void Update()
     {
-        if (state == State.Idle)
-        {
-            // check if player got enough leaves to cause a damage event
-
-        }
 
         if (playerState.score != scoreLerp)
         {
@@ -95,17 +93,19 @@ public class Game : MonoBehaviour
         }
 
         // evaluate goals - can do this on a callback when the game state changes
-        bool complete = true;
-        foreach (Goal goal in currentLevel.goals)
+        if (state == State.Idle)
         {
-            if (!goal.Evaluate(playerState))
-                complete = false;
+            bool complete = true;
+            foreach (Goal goal in currentLevel.goals)
+            {
+                if (!goal.Evaluate(playerState))
+                    complete = false;
+            }
+            if (complete)
+            {
+                OnLevelComplete();
+            }
         }
-        if (complete)
-        {
-            OnLevelComplete();
-        }
-
     }
 
     public void OnTileMouseClicked(int x, int y, Piece piece)
@@ -113,6 +113,11 @@ public class Game : MonoBehaviour
         if (state != State.Idle) return;
         // is there even a piece here?
         if (piece == null) return;
+        if (piece.hp <= 0)
+        {
+            // to-do: make a bad noise or something
+            return;
+        }
         state = State.Picking;
         startingPiece = piece;
         piece.Select();
@@ -127,7 +132,7 @@ public class Game : MonoBehaviour
         // are we idle?
         if (state != State.Picking) return;
         // does the type match?
-        if (!piece.IsSameType(startingPiece)) return;
+        if (!piece.Matches(startingPiece)) return;
         // is this tile adjacent to the last one?
         MatchData end = matches.GetEnd();
         Debug.Assert(end != null);
@@ -227,22 +232,26 @@ public class Game : MonoBehaviour
 
     void EvaluateFailState()
     {
+        Debug.Assert(state != State.Fail);
         int longestMatch = 0;
         for (int x = 0; x < board.width; x++)
         {
             for (int y = 0; y < board.height; y++)
             {
                 Piece piece = board.GetPiece(x, y);
-                if (piece != null)
+                if (piece != null && piece.hp > 0)
                 {
                     longestMatch = Mathf.Max(longestMatch, longestMatchFinder.Search(piece, 3));
                 }
             }
         }
+        Debug.Log("Longest match found (max 3): " + longestMatch);
         if (longestMatch < 3)
         {
             // set the fail screen on but only after a little while
             StartCoroutine(OpenFailScreen());
+            // to prevent anything else happening, put the game into a non-interactive state
+            state = State.Fail;
         }
     }
 
@@ -250,5 +259,22 @@ public class Game : MonoBehaviour
     {
         yield return failWaitDelay;
         levelFailedUI.SetActive(true);
+    }
+
+    void OnTurn()
+    {
+        if (state == State.Fail) return;
+        // all the pieces get to take a turn
+        for (int x = 0; x < board.width; x++)
+        {
+            for (int y = 0; y < board.height; y++)
+            {
+                Piece piece = board.GetPiece(x, y);
+                if (piece != null)
+                {
+                    piece.OnTurn();
+                }
+            }
+        }
     }
 }
