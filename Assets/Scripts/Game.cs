@@ -45,6 +45,9 @@ public class Game : MonoBehaviour
     // score lerper
     long scoreLerp;
 
+    // Fail waiter
+    WaitForSeconds failWaitDelay = new WaitForSeconds(0.5f);
+
     void Start()
     {
         longestMatchFinder.board = board;
@@ -238,7 +241,14 @@ public class Game : MonoBehaviour
         }
         if (longestMatch < 3)
         {
-            levelFailedUI.SetActive(true);
+            // set the fail screen on but only after a little while
+            StartCoroutine()
         }
+    }
+
+    IEnumerator OpenFailScreen()
+    {
+        yield return failWaitDelay;
+        levelFailedUI.SetActive(true);
     }
 }
